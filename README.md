@@ -35,7 +35,8 @@ The backend server will run at `http://localhost:5001`.
 ```bash
 cd frontend
 npm install
-# NOTE: No .env file is required for the frontend!
+# NOTE: The frontend is currently configured to use the production backend:
+# https://bsw-app-omega.vercel.app/api
 npm run dev
 ```
 The frontend will run at `http://localhost:3000`. It will communicate with the backend at port 5000.

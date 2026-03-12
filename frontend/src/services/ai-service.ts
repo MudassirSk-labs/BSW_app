@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://127.0.0.1:5001/api';
+const BACKEND_URL = 'https://bsw-app-omega.vercel.app/api';
 
 /**
  * AI Service for Schedule Optimization
