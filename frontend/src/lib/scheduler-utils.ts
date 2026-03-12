@@ -2,7 +2,7 @@
 
 import { format, addDays, startOfWeek, isThursday } from 'date-fns';
 
-const BACKEND_URL = 'http://localhost:5000/api';
+const BACKEND_URL = 'http://127.0.0.1:5000/api';
 
 export interface DaySchedule {
   id?: string;
