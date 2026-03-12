@@ -1,10 +1,10 @@
-# BSW App - Decoupled Architecture
+# BSW App - Decoupled Architecture (Secure Backend)
 
 This project is a production-grade employee management and scheduling application with a Next.js frontend and a Node.js/Express backend, integrated with Supabase.
 
 ## Project Structure
-- `/frontend`: Next.js 15+ application (UI/UX).
-- `/backend`: Node.js/Express API (Employee CRUD).
+- `/frontend`: Next.js 15+ application (UI/UX). All requests are proxied via the backend.
+- `/backend`: Node.js/Express API. **All environment variables are centralized here.**
 
 ---
 
@@ -19,7 +19,14 @@ This project is a production-grade employee management and scheduling applicatio
 ```bash
 cd backend
 npm install
-# Ensure .env is configured with SUPABASE_URL and SUPABASE_ANON_KEY
+# Configure .env with the following:
+# PORT=5000
+# SUPABASE_URL=...
+# SUPABASE_ANON_KEY=...
+# SUPABASE_SERVICE_ROLE_KEY=...
+# GROQ_API_KEY=...
+# ADMIN_USER=Admin
+# ADMIN_PASS=1234
 npm run dev
 ```
 The backend server will run at `http://localhost:5000`.
@@ -28,14 +35,10 @@ The backend server will run at `http://localhost:5000`.
 ```bash
 cd frontend
 npm install
-# Ensure .env.local is configured:
-# NEXT_PUBLIC_SUPABASE_URL=...
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-# ADMIN_USER=Admin (or your desired user)
-# ADMIN_PASS=1234 (or your desired pass)
+# NOTE: No .env file is required for the frontend!
 npm run dev
 ```
-The frontend will run at `http://localhost:3000`. You can log in using the credentials defined in your `.env.local`.
+The frontend will run at `http://localhost:3000`. It will communicate with the backend at port 5000.
 
 ---
 

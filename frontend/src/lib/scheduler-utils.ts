@@ -1,7 +1,8 @@
 'use client';
 
 import { format, addDays, startOfWeek, isThursday } from 'date-fns';
-import { supabase } from '@/lib/supabase';
+
+const BACKEND_URL = 'http://localhost:5000/api';
 
 export interface DaySchedule {
   id?: string;
@@ -33,21 +34,19 @@ export const SchedulerUtils = {
   },
 
   async fetchSchedule(employeeIds: string[]): Promise<DaySchedule[]> {
-    const { data, error } = await supabase
-      .from('schedule')
-      .select('*')
-      .in('employee_id', employeeIds);
-
-    if (error) throw error;
-    return data || [];
+    const response = await fetch(`${BACKEND_URL}/schedule?employee_ids=${employeeIds.join(',')}`);
+    if (!response.ok) throw new Error('Failed to fetch schedule');
+    return await response.json();
   },
 
   async saveSchedule(days: DaySchedule[]): Promise<void> {
-    const { error } = await supabase
-      .from('schedule')
-      .upsert(days, { onConflict: 'employee_id,day_date' });
+    const response = await fetch(`${BACKEND_URL}/schedule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ days }),
+    });
 
-    if (error) throw error;
+    if (!response.ok) throw new Error('Failed to save schedule');
   },
 
   calculateWorkingDays(days: DaySchedule[]): number {

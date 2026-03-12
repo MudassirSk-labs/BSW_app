@@ -1,45 +1,36 @@
-import { supabase } from '@/lib/supabase';
 import { Employee } from '@/types/employee';
+
+const BACKEND_URL = 'http://localhost:5000/api';
 
 /**
  * Backend Service Layer for Employee Management
- * Refactored to use Supabase for persistent data.
+ * Proxied via Node.js Backend API
  */
 export const EmployeeService = {
   async getAll(): Promise<Employee[]> {
-    const { data, error } = await supabase
-      .from('employees')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data as Employee[];
+    const response = await fetch(`${BACKEND_URL}/employees`);
+    if (!response.ok) throw new Error('Failed to fetch employees');
+    return await response.json();
   },
 
   async add(employee: Omit<Employee, 'id' | 'createdAt'>): Promise<Employee> {
-    const { data, error } = await supabase
-      .from('employees')
-      .insert([
-        {
-          name: employee.name,
-          email: employee.email,
-          phone: employee.phone,
-          role: employee.role,
-        }
-      ])
-      .select()
-      .single();
+    const response = await fetch(`${BACKEND_URL}/employees`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(employee),
+    });
 
-    if (error) throw error;
-    return data as Employee;
+    if (!response.ok) throw new Error('Failed to add employee');
+    return await response.json();
   },
 
   async deleteMany(ids: string[]): Promise<void> {
-    const { error } = await supabase
-      .from('employees')
-      .delete()
-      .in('id', ids);
+    const response = await fetch(`${BACKEND_URL}/employees`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids }),
+    });
 
-    if (error) throw error;
+    if (!response.ok) throw new Error('Failed to delete employees');
   }
 };

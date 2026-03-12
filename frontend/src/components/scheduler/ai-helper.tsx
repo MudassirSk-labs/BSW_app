@@ -17,7 +17,10 @@ export function AIHelper({ employees, schedule }: AIHelperProps) {
 
   const getAnalysis = async () => {
     setIsLoading(true);
-    const result = await AIService.analyzeSchedule(employees, schedule);
+    const result = await AIService.analyzeSchedule(
+      JSON.stringify(employees, null, 2), 
+      JSON.stringify(schedule, null, 2)
+    );
     setAnalysis(result);
     setIsLoading(false);
   };

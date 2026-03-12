@@ -1,34 +1,38 @@
-import Groq from 'groq-sdk';
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || 'MISSING_API_KEY',
-});
+const BACKEND_URL = 'http://localhost:5000/api';
 
 /**
- * Backend Service for AI Operations
- * Decoupled from the UI to ensure scalability
+ * AI Service for Schedule Optimization
+ * Proxied via Node.js Backend API
  */
 export const AIService = {
-  async analyzeSchedule(employees: any[], schedule: any[]) {
+  async analyzeSchedule(employees: string, schedule: string): Promise<string> {
+    const prompt = `
+      Analyze the following employee schedule for a retail store and provide optimization suggestions:
+      
+      Employees:
+      ${employees}
+      
+      Schedule:
+      ${schedule}
+      
+      Focus on:
+      1. Store coverage (ensure enough people are working each day).
+      2. Fairness (distribution of off-days).
+    `;
+
     try {
-      const chatCompletion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a workforce management expert for BSW Store. Analyze the 14-day schedule and provide a brief optimization summary. Mention any days with low coverage. Tuesdays and Wednesdays usually need more staff.'
-          },
-          {
-            role: 'user',
-            content: `Analyze this workforce: ${JSON.stringify(employees)}. Current schedule summary: ${JSON.stringify(schedule)}`
-          }
-        ],
-        model: 'mixtral-8x7b-32768',
+      const response = await fetch(`${BACKEND_URL}/ai/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
       });
 
-      return chatCompletion.choices[0]?.message?.content || "No analysis available.";
+      if (!response.ok) throw new Error('AI analysis failed');
+      const data = await response.json();
+      return data.analysis;
     } catch (error) {
-      console.error('Groq AI Error:', error);
-      return "AI analysis unavailable (Check Groq API Key).";
+      console.error('AI Service Error:', error);
+      return "I'm sorry, I couldn't analyze the schedule right now. Please check if the backend is running.";
     }
-  }
+  },
 };

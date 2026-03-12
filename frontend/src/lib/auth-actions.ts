@@ -2,54 +2,43 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { supabase } from './supabase';
+
+const BACKEND_URL = 'http://localhost:5000/api';
 
 /**
- * Enhanced Login Logic
- * 1. Checks credentials against .env variables for immediate access (Admin override).
- * 2. Fallback to Supabase Auth if .env match fails (for production scalability).
+ * Login via Backend API Proxy
  */
 export async function login(formData: FormData) {
   const user = formData.get('user') as string;
   const pass = formData.get('pass') as string;
 
-  const adminUser = process.env.ADMIN_USER || 'Admin';
-  const adminPass = process.env.ADMIN_PASS || '1234';
-
-  // Check against .env credentials first (Fulfills user request to use .env for login)
-  if (user === adminUser && pass === adminPass) {
-    // Set a secure session cookie
-    (await cookies()).set('supabase-auth-token', 'env-session-active', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
+  try {
+    const response = await fetch(`${BACKEND_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user, pass }),
     });
-    redirect('/dashboard/employees');
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || 'Login failed' };
+    }
+
+    if (data.token) {
+      (await cookies()).set('supabase-auth-token', data.token, {
+        httpOnly: true,
+        secure: false, // Local dev, change if deploying
+        sameSite: 'lax',
+        path: '/',
+      });
+      redirect('/dashboard/employees');
+    }
+
+    return { error: 'Unknown authentication error' };
+  } catch (err: any) {
+    return { error: 'Backend server is unreachable' };
   }
-
-  // Fallback: Attempt Supabase Auth
-  const authEmail = user.includes('@') ? user : `${user}@bsw.com`;
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: authEmail,
-    password: pass,
-  });
-
-  if (error) {
-    return { error: 'Invalid login credentials. Please check .env or Supabase dashboard.' };
-  }
-
-  if (data.session) {
-    (await cookies()).set('supabase-auth-token', data.session.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
-    redirect('/dashboard/employees');
-  }
-
-  return { error: 'Unknown authentication error' };
 }
 
 export async function logout() {
