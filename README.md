@@ -29,7 +29,7 @@ npm install
 # ADMIN_PASS=1234
 npm run dev
 ```
-The backend server will run at `http://localhost:5000`.
+The backend server will run at `http://localhost:5001`.
 
 ### 3. Setting up the Frontend
 ```bash

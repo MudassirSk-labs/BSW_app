@@ -1,38 +1,35 @@
-# Postman API Documentation (Supabase)
+# Postman API Documentation (Proxy)
 
-Since we are using Supabase as our backend service, you can interact with the API directly using the Postman collection below.
+All requests should now be directed to the Node.js Backend API, which acts as a secure proxy to Supabase.
 
 ## Base Configuration
-- **URL**: `https://wgwceabdmkibawivuirc.supabase.co/rest/v1`
-- **Headers**:
-    - `apikey`: `sb_publishable_0K8TQFz5c045HTJdCLWpzw_ckD3y-7a`
-    - `Authorization`: `Bearer {{USER_TOKEN}}` (Obtained after login)
-    - `Content-Type`: `application/json`
+- **Base URL**: `http://localhost:5001/api`
+- **Content-Type**: `application/json`
 
 ---
 
 ## 1. Authentication
 
-### Login (Sign In with Password)
-- **POST** `https://wgwceabdmkibawivuirc.supabase.co/auth/v1/token?grant_type=password`
+### Login
+- **POST** `{{Base URL}}/auth/login`
 - **Body**:
 ```json
 {
-  "email": "admin@bsw.com",
-  "password": "your_password"
+  "user": "Admin",
+  "pass": "1234"
 }
 ```
-- **Note**: Copy the `access_token` from the response to use in the `Authorization` header for other requests.
+- **Note**: The response will include a `token`. Use this if you want to test restricted Supabase calls, but the Proxy handles the Service Role key internally.
 
 ---
 
 ## 2. Employee Management
 
 ### Get All Employees
-- **GET** `{{URL}}/employees?select=*&order=created_at.desc`
+- **GET** `{{Base URL}}/employees`
 
 ### Add New Employee
-- **POST** `{{URL}}/employees`
+- **POST** `{{Base URL}}/employees`
 - **Body**:
 ```json
 {
@@ -44,27 +41,47 @@ Since we are using Supabase as our backend service, you can interact with the AP
 ```
 
 ### Delete Employees (Bulk)
-- **DELETE** `{{URL}}/employees?id=in.("uuid1","uuid2")`
+- **DELETE** `{{Base URL}}/employees`
+- **Body**:
+```json
+{
+  "ids": ["uuid1", "uuid2"]
+}
+```
 
 ---
 
 ## 3. Scheduler
 
 ### Get Schedule
-- **GET** `{{URL}}/schedule?select=*&employee_id=in.("uuid1","uuid2")`
+- **GET** `{{Base URL}}/schedule?employee_ids=uuid1,uuid2`
 
-### Upsert Schedule (Save/Update)
-- **POST** `{{URL}}/schedule`
-- **Headers**: `Prefer: resolution=merge-duplicates`
+### Save Schedule
+- **POST** `{{Base URL}}/schedule`
 - **Body**:
 ```json
-[
-  {
-    "employee_id": "uuid1",
-    "day_date": "2026-03-12",
-    "is_off": false,
-    "is_required_off": false,
-    "is_manual_off": false
-  }
-]
+{
+  "days": [
+    {
+      "employee_id": "uuid1",
+      "day_date": "2026-03-12",
+      "is_off": false,
+      "is_required_off": false,
+      "is_manual_off": false
+    }
+  ]
+}
+```
+
+---
+
+## 4. AI Helper
+
+### Analyze Coverage
+- **POST** `{{Base URL}}/ai/analyze`
+- **Body**:
+```json
+{
+  "prompt": "Analyze these employees for a weekend shift..."
+}
 ```

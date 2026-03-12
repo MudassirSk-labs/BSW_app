@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-const BACKEND_URL = 'http://127.0.0.1:5000/api';
+const BACKEND_URL = 'http://127.0.0.1:5001/api';
 
 /**
  * Login via Backend API Proxy
