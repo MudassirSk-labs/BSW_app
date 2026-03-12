@@ -21,20 +21,33 @@ const port = process.env.PORT || 5000;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Error: Missing Supabase credentials. If running locally, please add them to .env or run "vercel env pull".');
-  process.exit(1);
+let supabase: any;
+if (supabaseUrl && supabaseKey) {
+  try {
+    supabase = createClient(supabaseUrl, supabaseKey);
+  } catch (err) {
+    console.error('Failed to initialize Supabase client:', err);
+  }
+} else {
+  console.warn('⚠️ Warning: Supabase credentials missing. Some routes will fail.');
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 // Groq Configuration
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 
 app.use(cors());
 app.use(express.json());
+
+// --- Diagnostic Route ---
+app.get('/api/debug', (req, res) => {
+  res.json({
+    hasSupabaseUrl: !!process.env.SUPABASE_URL,
+    hasSupabaseKey: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY),
+    hasGroqKey: !!process.env.GROQ_API_KEY,
+    nodeEnv: process.env.NODE_ENV,
+    port: process.env.PORT
+  });
+});
 
 // --- Auth Routes ---
 app.post('/api/auth/login', async (req, res) => {
@@ -149,6 +162,11 @@ app.post('/api/schedule', async (req, res) => {
 app.post('/api/ai/analyze', async (req, res) => {
   try {
     const { prompt } = req.body;
+    
+    if (!groq) {
+      return res.status(503).json({ error: 'AI Service (Groq) is not configured on the server.' });
+    }
+
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {

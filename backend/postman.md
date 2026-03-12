@@ -1,10 +1,21 @@
-# Postman API Documentation (Proxy)
+# Postman API Documentation (Production Proxy)
 
-All requests should now be directed to the Node.js Backend API, which acts as a secure proxy to Supabase.
+All requests should be directed to the deployed Vercel Backend API.
 
 ## Base Configuration
-- **Base URL**: `http://localhost:5001/api`
+- **Base URL**: `https://bsw-app-omega.vercel.app/api`
 - **Content-Type**: `application/json`
+
+---
+
+## 0. Diagnostics
+
+### Check Backend Status
+- **GET** `{{Base URL}}/debug`
+- **Expected Response**: JSON showing the status of environment variables (Supabase URL, Key, etc.) on the Vercel server.
+
+### Health Check
+- **GET** `{{Base URL}}/health`
 
 ---
 
@@ -19,7 +30,6 @@ All requests should now be directed to the Node.js Backend API, which acts as a 
   "pass": "1234"
 }
 ```
-- **Note**: The response will include a `token`. Use this if you want to test restricted Supabase calls, but the Proxy handles the Service Role key internally.
 
 ---
 
