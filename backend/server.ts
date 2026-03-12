@@ -167,10 +167,14 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-const server = app.listen(Number(port), '0.0.0.0', () => {
-  console.log(`Backend server running at http://127.0.0.1:${port}`);
-});
+export default app;
 
-server.on('error', (err) => {
-  console.error('Server failed to start:', err);
-});
+if (process.env.NODE_ENV !== 'production' || require.main === module) {
+  const server = app.listen(Number(port), '0.0.0.0', () => {
+    console.log(`Backend server running at http://127.0.0.1:${port}`);
+  });
+
+  server.on('error', (err) => {
+    console.error('Server failed to start:', err);
+  });
+}

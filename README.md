@@ -68,5 +68,26 @@ git push
 
 ---
 
+## 🚀 Deployment to Vercel
+
+### 1. Backend Deployment
+1.  Push your code to GitHub.
+2.  Import the project in Vercel.
+3.  Set the **Root Directory** to `backend`.
+4.  Add the following **Environment Variables** in Vercel:
+    - `SUPABASE_URL`
+    - `SUPABASE_SERVICE_ROLE_KEY`
+    - `GROQ_API_KEY`
+    - `ADMIN_USER`
+    - `ADMIN_PASS`
+5.  Deploy! Your backend will be at `https://your-backend.vercel.app`.
+
+### 2. Frontend Deployment
+1.  Import the project in Vercel.
+2.  Set the **Root Directory** to `frontend`.
+3.  Ensure the code points to your *deployed* backend URL (update the `BACKEND_URL` in frontend services if necessary, or use an environment variable).
+
+---
+
 ## 🧪 API Testing
 Refer to `backend/postman.md` for a complete list of endpoints and sample payloads for testing with Postman.
