@@ -72,9 +72,6 @@ export default function LoginPage() {
           </CardFooter>
         </form>
       </Card>
-      <div className="fixed bottom-4 text-xs text-zinc-400 dark:text-zinc-600">
-        Demo Credentials: User - Admin / Pass - 1234
-      </div>
     </div>
   );
 }

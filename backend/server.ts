@@ -6,6 +6,14 @@ import Groq from 'groq-sdk';
 
 dotenv.config();
 
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -159,6 +167,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(port, () => {
-  console.log(`Backend server running at http://localhost:${port}`);
+const server = app.listen(Number(port), '0.0.0.0', () => {
+  console.log(`Backend server running at http://127.0.0.1:${port}`);
+});
+
+server.on('error', (err) => {
+  console.error('Server failed to start:', err);
 });
