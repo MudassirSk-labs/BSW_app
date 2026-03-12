@@ -28,10 +28,14 @@ The backend server will run at `http://localhost:5000`.
 ```bash
 cd frontend
 npm install
-# Ensure .env.local is configured with NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Ensure .env.local is configured:
+# NEXT_PUBLIC_SUPABASE_URL=...
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+# ADMIN_USER=Admin (or your desired user)
+# ADMIN_PASS=1234 (or your desired pass)
 npm run dev
 ```
-The frontend will run at `http://localhost:3000`.
+The frontend will run at `http://localhost:3000`. You can log in using the credentials defined in your `.env.local`.
 
 ---
 
